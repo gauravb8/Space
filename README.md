@@ -1,2 +1,2 @@
 # Space
-Data sharing application over LAN written in the MEAN stack.
+Lightweight Data sharing application written in the MEAN stack.
