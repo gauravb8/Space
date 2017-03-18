@@ -1,0 +1,56 @@
+*{
+    box-sizing: border-box;
+}
+
+html, body{
+	height: 98%;
+}
+*:focus {
+    outline: none;
+}
+
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  overflow-x: hidden;
+  display: flex;
+  /*overflow: hidden;*/
+  height: 100vh;
+  /*position: relative;*/
+  width: 100%;
+  /*backface-visibility: hidden;*/
+  /*will-change: overflow;*/
+}
+
+a {
+  color: #00B7FF;
+}
+
+#btn {
+	background-color: green;
+}
+
+#btn:hover { 
+	background-color: blue;
+}
+
+#right, #left{
+	overflow: auto;
+    height: auto;
+    /*padding: .5rem;*/
+    -webkit-overflow-scrolling: touch;
+    -ms-overflow-style: none;
+}
+
+#left::-webkit-scrollbar,
+#right::-webkit-scrollbar {
+    display: none;
+}
+
+.group:hover{
+	background-color: #EFEFEF;
+}
+
+.fixed{
+	position: fixed;
+}
