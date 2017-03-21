@@ -4,36 +4,43 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<!-- Angular Material style sheet -->
 	<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.css">
+
 	<link rel="stylesheet" type="text/css" href="stylesheets/style.css">
+
+	<script src="javascripts/socket.io.js"></script>
 	<!-- Angular Material requires Angular.js Libraries -->
   	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
   	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-animate.min.js"></script>
   	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-aria.min.js"></script>
   	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-messages.min.js"></script>
 
+  	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-route.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-resource.js"></script>
+
   	<!-- Angular Material Library -->
   	<script src="http://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.js"></script>
   	<script src="javascripts/myApp.js"></script>
+
 </head>
 
 <body ng-controller="Ctrl as vm" >
-<div id="left" style="width: 25%; float: left">
-	<div class="group" ng-repeat="grp in groups" ng-click="loadGroup( grp.name )">
-		<p>{{grp.name}}</p>
-		<small ng-repeat="user in grp.users">{{user}}, </small>
+	<div id="left" style="width: 25%; float: left">
+		<div id="group" class="group" ng-repeat="grp in groups | orderBy:'latestPost':true " ng-click="loadGroup( grp._id )">
+			<p>{{grp.name}}</p>
+			<small ng-repeat="user in grp.users">{{user}}, </small>
+		</div>
 	</div>
-</div>
 
-<div id="right" style="width: 75%; float: right">
-	<input type="file" id="myfile" name="myfile">
-	<md-button class="md-raised md-primary" type="submit" ng-click="uploadFile()">Upload</md-button>
-	<md-progress-linear md-mode="determinate" value="{{vm.determinateValue}}" ng-show="showBar"></md-progress-linear>
-	<div ng-repeat="post in posts">
-		<p>{{post.name}}</p>
-		<a href="{{post.path}}" download>Download</a>
-		<small>{{post.size}}</small>
-		<small>{{post.user}}</small>
+	<div id="right" ng-show="currentGroupId" style="width: 75%; float: right">
+		<input type="file" id="myfile" name="myfile">
+		<md-button class="md-raised md-primary" type="submit" ng-click="uploadFile()">Upload</md-button>
+		<md-progress-linear md-mode="determinate" value="{{vm.determinateValue}}" ng-show="showBar"></md-progress-linear>
+		<div ng-repeat="post in posts | orderBy:'created_at':true ">
+			<p>{{post.name}}</p>
+			<a href="{{post.path}}" download>Download</a>
+			<small>{{post.size}}</small>
+			<small>{{post.user}}</small>
+		</div>
 	</div>
-</div>
 </body>
 </html>

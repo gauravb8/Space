@@ -1,10 +1,12 @@
-angular.module('myApp', ['ngMaterial'])
-  .config(function($mdThemingProvider) {
-  })
-  .controller('Ctrl', function($scope, $interval, $http) {
+var app = angular.module('myApp', ['ngMaterial','ngRoute','ngResource']);
+
+
+
+app.controller('Ctrl', function($scope, $interval, $http) {
+    // var socket = io();
     //Do not show progress bar initially
     $scope.showBar = 0;
-
+    $scope.currentGroupId = 0;
     //Get Groups list..
     $http.get('/groups').success( function(res){
       $scope.groups = res;
@@ -18,9 +20,10 @@ angular.module('myApp', ['ngMaterial'])
     }, 100, 0, true);
 
     //To load posts specific to a group from DB...
-    $scope.loadGroup = function(grpname){
-      console.log(grpname);
-      $http.get('/groupPosts', { params : {name : grpname } }).success( function(res){
+    $scope.loadGroup = function(grpid){
+      $scope.currentGroupId = grpid;
+      console.log(grpid);
+      $http.get('/groupPosts', { params : {id : grpid } }).success( function(res){
         $scope.posts = res;
       });
     }
@@ -33,6 +36,8 @@ angular.module('myApp', ['ngMaterial'])
       var formData = new FormData();
       var file = document.getElementById('myfile').files[0];
       formData.append('myfile', file);
+      formData.append('user', 'gaurav');
+      formData.append('groupid', $scope.currentGroupId);
       var xhr = new XMLHttpRequest();
 
       // your url upload
@@ -53,9 +58,12 @@ angular.module('myApp', ['ngMaterial'])
         $scope.showBar = 0;
         self.determinateValue = 0;
         console.log(this.statusText);
-        $http.get('/posts').success( function(res){
+        $http.get('/groupPosts', { params : {id : $scope.currentGroupId } }).success( function(res){
           $scope.posts = res;
           console.log($scope.posts.length);
+        });
+        $http.get('/groups').success( function(res){
+          $scope.groups = res;
         });
       };
       xhr.send(formData);

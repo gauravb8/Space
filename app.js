@@ -1,13 +1,25 @@
 var express = require('express');
+var app = express();
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
-var multer = require('multer');
+
+//Mongoose setup..
+require('./models/models');
 var mongoose = require('mongoose');
+var Post = mongoose.model('Post');
+var Group = mongoose.model('Group');
+var User = mongoose.model('User');
 
 mongoose.connect('mongodb://localhost/mydb');
 
+// Socket.io setup..
+var io = require('socket.io')();
+app.io = io;
+
+// Multer setup..
+var multer = require('multer');
 var storage = multer.diskStorage({
   destination: function(req, file, cb){
     cb(null, path.join(__dirname, 'public', 'store'));
@@ -17,42 +29,11 @@ var storage = multer.diskStorage({
   }
 });
 
-var postSchema = mongoose.Schema({
-  name : String,
-  size : Number,
-  dest : String,
-  path : String,
-  user : String,
-  group : String
-});
-
-var User = mongoose.model('User', { name : String,
-                                    password : String,
-                                    groups : [String]
-});
-
-var Group = mongoose.model('Group', { name : String,
-                                      users : [String]
-});
-
-// var gaurav = new User({ name : 'Gaurav',
-//                         password : 'password',
-//                         groups : [ '2k17', 'Birla']
-// })
-// gaurav.save( function(err, gaurav){
-//   if (err)
-//     console.log('Error saving user');
-//   console.log('User Saved');
-// });
-
-var Post = mongoose.model('Post', postSchema);
-
 var upload = multer( {storage : storage} );
 
+// Routing APIs. Not used currently..
 var routes = require('./routes/index');
 var users = require('./routes/users');
-
-var app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -63,6 +44,10 @@ app.set('view engine', 'ejs');
 app.use(logger('dev'));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+io.on('connection', function(socket){
+  console.log('New user connected');
+});
 
 app.get('/', function(req, res, next){
 	res.sendFile(path.join(__dirname, 'public','index.html'));
@@ -85,9 +70,8 @@ app.get('/groups', function(req, res, next){
 });
 
 app.get('/groupPosts', function(req, res, next){
-  var grp = req.query.name;
-  console.log(grp);
-  Post.find( { group : grp }, function(err, posts){
+  var id = req.query.id;
+  Post.find( { group : id }, function(err, posts){
     if (err)
       return res.status(500).send(err);
     return res.status(200).send(posts);
@@ -98,14 +82,17 @@ app.post('/upload', upload.single('myfile'), function(req, res, next){
   if (!req.file)
     return res.status(400).send('No files');
   console.log('creating post');
+  var date = Date.now();
+  // Create new post.
   var newPost = new Post({ name : req.file.originalname,
                            size : req.file.size,
-                           dest : req.file.destination,
                            path : 'store/' + req.file.originalname,
-                           user : 'Gaurav',
-                           group : '2k17'
+                           user : req.body.user,
+                           group : req.body.groupid,
+                           created_at : date
   });
   console.log('new post created');
+  // Save new post to database.
   newPost.save(function(err, newPost){
     if (err){
       console.log('Error occured');
@@ -114,7 +101,13 @@ app.post('/upload', upload.single('myfile'), function(req, res, next){
     console.log('Post saved to DB');
   });
   console.log('file uploaded : '+req.file.originalname);
-  return res.status(200).send('uploaded');
+  // Update latestPost value for group.
+  Group.update( { _id: req.body.groupid } , { latestPost : date }, {}, function(err, doc){
+    if (err)
+      return res.status(500).send(err);
+    console.log('Group latestPost updated');
+  });
+  return res.status(200).send('uploaded and updated');
 });
 
 // catch 404 and forward to error handler

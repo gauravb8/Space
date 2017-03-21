@@ -5,6 +5,7 @@
 html, body{
 	height: 98%;
 }
+
 *:focus {
     outline: none;
 }
@@ -50,7 +51,13 @@ a {
 .group:hover{
 	background-color: #EFEFEF;
 }
+.group:active{
+  background-color: #EFEFEF;
+}
 
-.fixed{
-	position: fixed;
+.register{
+  height: 30vh;
+  width: 25%;
+  left: auto;
+  right: auto;
 }
