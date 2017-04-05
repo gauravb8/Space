@@ -61,3 +61,9 @@ a {
   left: auto;
   right: auto;
 }
+
+.form-auth{
+  max-width: 330px;
+  padding: 5px;
+  margin: 0 auto;
+}

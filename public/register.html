@@ -1,8 +1,7 @@
-<form class="form-auth" style="	max-width: 330px;
-							   	padding: 5px;
-								margin: 0 auto; ">
+<form class="form-auth" ng-submit="register()">
 	<h2>Register</h2>
-	<input type="username" placeholder="Username" class="form-control"><br>
-	<input type="password" placeholder="Password" class="form-control"><br>
+	<p class="text-warning">{{error_message}}</p>
+	<input type="username" ng-model="user.username" placeholder="Username" class="form-control"><br>
+	<input type="password" ng-model="user.password" placeholder="Password" class="form-control"><br>
 	<input type="submit" value="Register" class="btn btn-primary" />
 </form>

@@ -1,1 +1,18 @@
-main.html
+<div id="left" style="width: 25%; float: left">
+		<div id="group" class="group" ng-repeat="grp in groups | orderBy:'latestPost':true " ng-click="loadGroup( grp._id )">
+			<p>{{grp.name}}</p>
+			<small ng-repeat="user in grp.users">{{user}}, </small>
+		</div>
+	</div>
+
+	<div id="right" ng-show="currentGroupId" style="width: 75%; float: right">
+		<input type="file" id="myfile" name="myfile">
+		<md-button class="md-raised md-primary" type="submit" ng-click="uploadFile()">Upload</md-button>
+		<md-progress-linear md-mode="determinate" value="{{vm.determinateValue}}" ng-show="showBar"></md-progress-linear>
+		<div ng-repeat="post in posts | orderBy:'created_at':true ">
+			<p>{{post.name}}</p>
+			<a href="{{post.path}}" download>Download</a>
+			<small>{{post.size}}</small>
+			<small>{{post.user}}</small>
+		</div>
+	</div>
