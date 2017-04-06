@@ -2,10 +2,6 @@
     box-sizing: border-box;
 }
 
-html, body{
-	height: 98%;
-}
-
 *:focus {
     outline: none;
 }
@@ -17,7 +13,7 @@ body {
   display: flex;
   /*overflow: hidden;*/
   height: 100vh;
-  /*position: relative;*/
+  /*position: absolute;*/
   width: 100%;
   /*backface-visibility: hidden;*/
   /*will-change: overflow;*/
@@ -36,11 +32,12 @@ a {
 }
 
 #right, #left{
+  padding-right: 25px;
 	overflow: auto;
-    height: auto;
-    /*padding: .5rem;*/
-    -webkit-overflow-scrolling: touch;
-    -ms-overflow-style: none;
+  height: 100%;
+  /*padding: .5rem;*/
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: none;
 }
 
 #left::-webkit-scrollbar,
@@ -66,4 +63,8 @@ a {
   max-width: 330px;
   padding: 5px;
   margin: 0 auto;
+}
+
+.box {
+  margin-top: 50px;
 }

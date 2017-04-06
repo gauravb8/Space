@@ -19,12 +19,15 @@ app.run(function($rootScope, $http, $location) {
         {
           $rootScope.authenticated = true;
           $rootScope.current_user = data.user.username;
-          $location.path('/');
+          console.log($rootScope.current_user);
+          $rootScope.user_id = data.user._id;
+          $location.path('/main');
         }
         else
         {
           $rootScope.authenticated = false;
           $rootScope.current_user = '';
+          $rootScope.user_id = '';
           $location.path('/');
         }
       });
@@ -37,14 +40,18 @@ app.config(function($routeProvider){
   $routeProvider
     //the timeline display
     .when('/', {
+      templateUrl: 'login.html',
+      controller: 'authController'
+    })
+    .when('/main', {
       templateUrl: 'main.html',
       controller: 'Ctrl as vm'
     })
     //the login display
-    // .when('/login', {
-    //   templateUrl: 'login.html',
-    //   controller: 'authController'
-    // })
+    .when('/login', {
+      templateUrl: 'login.html',
+      controller: 'authController'
+    })
     //the signup display
     .when('/register', {
       templateUrl: 'register.html',
@@ -52,13 +59,14 @@ app.config(function($routeProvider){
     });
 });
 
-app.controller('Ctrl', function($scope, $interval, $http) {
+app.controller('Ctrl', function($scope, $rootScope, $interval, $http) {
     // var socket = io();
     //Do not show progress bar initially
     $scope.showBar = 0;
     $scope.currentGroupId = 0;
+    console.log($rootScope.user_id);
     //Get Groups list..
-    $http.get('api/groups').success( function(res){
+    $http.get('api/groups', { params : {user_id: $rootScope.user_id } }).success( function(res){
       $scope.groups = res;
     });
 
@@ -86,8 +94,9 @@ app.controller('Ctrl', function($scope, $interval, $http) {
       var formData = new FormData();
       var file = document.getElementById('myfile').files[0];
       formData.append('myfile', file);
-      formData.append('user', 'gaurav');
+      formData.append('user', $rootScope.current_user);
       formData.append('groupid', $scope.currentGroupId);
+      formData.append('user_id', $rootScope.user_id);
       var xhr = new XMLHttpRequest();
 
       // your url upload
@@ -112,7 +121,7 @@ app.controller('Ctrl', function($scope, $interval, $http) {
           $scope.posts = res;
           console.log($scope.posts.length);
         });
-        $http.get('api/groups').success( function(res){
+        $http.get('api/groups', { params : {user_id: $rootScope.user_id } }).success( function(res){
           $scope.groups = res;
         });
       };
@@ -129,7 +138,8 @@ app.controller('authController', function($scope, $http, $rootScope, $location){
       if(data.state == 'success'){
         $rootScope.authenticated = true;
         $rootScope.current_user = data.user.username;
-        $location.path('/');
+        $rootScope.user_id = data.user._id;
+        $location.path('/main');
       }
       else{
         $scope.error_message = data.message;
@@ -144,7 +154,8 @@ app.controller('authController', function($scope, $http, $rootScope, $location){
       if(data.state == 'success'){
         $rootScope.authenticated = true;
         $rootScope.current_user = data.user.username;
-        $location.path('/');
+        $rootScope.user_id = data.user._id;
+        $location.path('/main');
       }
       else{
         $scope.error_message = data.message;

@@ -5,6 +5,9 @@ var mongoose = require( 'mongoose' );
 var Post = mongoose.model('Post');
 var Group = mongoose.model('Group');
 var User = mongoose.model('User');
+
+var async = require('async');
+
 function isAuthenticated (req, res, next) {
 	if(req.method === "GET"){
 		return next();
@@ -39,11 +42,50 @@ router.get('/posts', function(req, res, next){
 });
 
 router.get('/groups', function(req, res, next){
-  Group.find(function(err, groups){
+  var user_id = req.query.user_id;
+  console.log(user_id);
+  var group_ids = [],
+      groups = [];
+
+  var first = function(callback){
+    //Retrieve group ids given user is a part of.
+    User.findById(user_id, function(err, user){
+      console.log('Finding user');
+      if (err)
+        return res.status(500).send(err);
+      console.log('found user');
+      group_ids = user.group_ids;
+      console.log(group_ids);
+      callback();
+    });
+    console.log('debug1');
+  }
+
+  var second = function(callback){
+    //Retrieve group objects corresponding to ids.
+    console.log('debug2');
+    console.log(group_ids);
+    for (var i = 0; i < group_ids.length; ++i)
+    {
+      id = group_ids[i];
+      console.log(id);
+      Group.findById(id, function(err, group){
+        if (err)
+          return res.status(500).send(err);
+        groups.push(group);
+        if (groups.length == group_ids.length)
+          callback();
+      });
+    }
+  }
+
+  async.series( [first, second], function(err, results){
     if (err)
       return res.status(500).send(err);
+    console.log(results);
     return res.status(200).send(groups);
   });
+
 });
 
 router.get('/groupPosts', function(req, res, next){
@@ -55,6 +97,22 @@ router.get('/groupPosts', function(req, res, next){
   });
 });
 
+router.get('/exists', function(req, res, next){
+  //Checks if a Post with given name and size already exists.
+  Post.findOne( { name : req.query.name,
+                  size : req.query.size }, function(err, posts){
+                    if (err)
+                      return res.status(500).send(err);
+                    if (posts)
+                      return res.status(200).send( {exists: true} );
+                    return res.status(200).send( {exists: false} );
+                  });
+});
+
+router.post('/createPost', function(req, res, next){
+  var date = Date.now();
+})
+
 router.post('/upload', upload.single('myfile'), function(req, res, next){
   if (!req.file)
     return res.status(400).send('No files');
@@ -65,6 +123,7 @@ router.post('/upload', upload.single('myfile'), function(req, res, next){
                            size : req.file.size,
                            path : 'store/' + req.file.originalname,
                            user : req.body.user,
+                           user_id : req.body.user_id,
                            group : req.body.groupid,
                            created_at : date
   });
