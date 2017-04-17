@@ -97,6 +97,27 @@ router.get('/groupPosts', function(req, res, next){
   });
 });
 
+router.get('/users', function(req, res, next){
+  User.find({},'username', function(err, users){
+    if (err)
+      return res.status(500).send(err);
+    return res.status(200).send(users);
+  });
+});
+
+router.post('/createGroup', function(req, res, next){
+  var newGroup = new Group( { name: req.body.name,
+                              users: req.body.users,
+                              userIds: req.body.userids,
+                              latestPost: Date.now() 
+                            });
+  newGroup.save(function(err, newGroup){
+    if (err)
+      return res.status(500).send(err);
+    return res.status(200).send("new group created");
+  });
+});
+
 router.get('/exists', function(req, res, next){
   //Checks if a Post with given name and size already exists.
   Post.findOne( { name : req.query.name,

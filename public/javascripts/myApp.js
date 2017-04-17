@@ -1,4 +1,4 @@
-var app = angular.module('myApp', ['ngMaterial','ngRoute','ngResource']);
+var app = angular.module('myApp', ['ngMaterial','ngRoute','ngResource','angucomplete']);
 
 app.run(function($rootScope, $http, $location) {
   $rootScope.authenticated = false;
@@ -59,11 +59,122 @@ app.config(function($routeProvider){
     });
 });
 
-app.controller('Ctrl', function($scope, $rootScope, $interval, $http) {
+app.controller('Ctrl', function($scope, $rootScope, $interval, $http, $timeout, $q, $log) {
+    $scope.homepage = 1;
+    $scope.addMembers = 0;
+    $scope.addName = 0;
+    
+    var self = this;
+
+    //Autocomplete chips stuff..
+    var pendingSearch, cancelSearch = angular.noop;
+    var lastSearch;
+    loadUsers();
+
+    /**
+     * Search for contacts; use a random delay to simulate a remote call
+     */
+    function querySearch (criteria) {
+      return criteria ? self.allContacts.filter(createFilterFor(criteria)) : [];
+    }
+
+    /**
+     * Async search for contacts
+     * Also debounce the queries; since the md-contact-chips does not support this
+     */
+    function delayedQuerySearch(criteria) {
+      if ( !pendingSearch || !debounceSearch() )  {
+        cancelSearch();
+
+        return pendingSearch = $q(function(resolve, reject) {
+          // Simulate async search... (after debouncing)
+          cancelSearch = reject;
+          $timeout(function() {
+
+            resolve( self.querySearch(criteria) );
+
+            refreshDebounce();
+          }, Math.random() * 500, true)
+        });
+      }
+
+      return pendingSearch;
+    }
+
+    function refreshDebounce() {
+      lastSearch = 0;
+      pendingSearch = null;
+      cancelSearch = angular.noop;
+    }
+
+    /**
+     * Debounce if querying faster than 300ms
+     */
+    function debounceSearch() {
+      var now = new Date().getMilliseconds();
+      lastSearch = lastSearch || now;
+
+      return ((now - lastSearch) < 300);
+    }
+
+    /**
+     * Create filter function for a query string
+     */
+    function createFilterFor(query) {
+      var lowercaseQuery = angular.lowercase(query);
+
+      return function filterFn(contact) {
+        return (contact._lowername.indexOf(lowercaseQuery) != -1);
+      };
+    }
+
+    function loadUsers(){
+      return $http.get('api/users').success(function(res){
+        self.allContacts = [];
+        for (var i = 3; i < res.length; i++) {
+          res[i]._lowername = res[i].username.toLowerCase();
+          self.allContacts.push(res[i]);
+        }
+        self.contacts = [self.allContacts[0]];
+        self.asyncContacts = [];
+        self.filterSelected = true;
+        self.querySearch = querySearch;
+        self.delayedQuerySearch = delayedQuerySearch;
+      });
+    }
+
+    function loadContacts() {
+      var contacts = [
+        'Marina Augustine',
+        'Oddr Sarno',
+        'Nick Giannopoulos',
+        'Narayana Garner',
+        'Anita Gros',
+        'Megan Smith',
+        'Tsvetko Metzger',
+        'Hector Simek',
+        'Some-guy withalongalastaname'
+      ];
+
+      return contacts.map(function (c, index) {
+        var cParts = c.split(' ');
+        var email = cParts[0][0].toLowerCase() + '.' + cParts[1].toLowerCase() + '@example.com';
+
+        var contact = {
+          name: c,
+          email: email,
+        };
+        contact._lowername = contact.name.toLowerCase();
+        return contact;
+      });
+    }
+
+
     // var socket = io();
     //Do not show progress bar initially
     $scope.showBar = 0;
     $scope.currentGroupId = 0;
+    $scope.selected = '';
     console.log($rootScope.user_id);
     //Get Groups list..
     $http.get('api/groups', { params : {user_id: $rootScope.user_id } }).success( function(res){
@@ -71,7 +182,6 @@ app.controller('Ctrl', function($scope, $rootScope, $interval, $http) {
     });
 
     //progress bar setup
-    var self = this;
     self.activated = true;
     self.determinateValue = 0;
     $interval(function() {
@@ -79,6 +189,8 @@ app.controller('Ctrl', function($scope, $rootScope, $interval, $http) {
 
     //To load posts specific to a group from DB...
     $scope.loadGroup = function(grpid){
+      console.log(self.asyncContacts);
+      $scope.selected = "selected";
       $scope.currentGroupId = grpid;
       console.log(grpid);
       $http.get('api/groupPosts', { params : {id : grpid } }).success( function(res){

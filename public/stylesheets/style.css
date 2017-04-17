@@ -6,6 +6,10 @@
     outline: none;
 }
 
+h3{
+  left: auto;
+}
+
 body {
   padding: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
@@ -36,8 +40,18 @@ a {
 	overflow: auto;
   height: 100%;
   /*padding: .5rem;*/
+  position: relative;
   -webkit-overflow-scrolling: touch;
   -ms-overflow-style: none;
+}
+
+.upload-bar{
+  position: sticky;
+  top: 0px;
+}
+
+.posts{
+  margin-top: 20px;
 }
 
 #left::-webkit-scrollbar,
@@ -48,7 +62,8 @@ a {
 .group:hover{
 	background-color: #EFEFEF;
 }
-.group:active{
+
+.active{
   background-color: #EFEFEF;
 }
 

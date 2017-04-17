@@ -1,25 +1,60 @@
 <div id="left" ng-show="authenticated" style="width: 25%; float: left">
-	<h3>Spaces</h3>
-	<div id="group" class="group" ng-repeat="grp in groups | orderBy:'latestPost':true " ng-click="loadGroup( grp._id )">
+	<div ng-show="addMembers">
+		<md-content class="md-padding autocomplete" layout="column">
+		    <md-contact-chips
+		        ng-model="vm.asyncContacts"
+		        md-contacts="vm.delayedQuerySearch($query)"
+		        md-contact-name="username"
+		        md-contact-image="image"
+		        md-contact-email="email"
+		        md-require-match="true"
+		        md-highlight-flags="i"
+		        filter-selected="vm.filterSelected"
+		        placeholder="Search by username">
+		    </md-contact-chips>
+		</md-content>
+		<md-button class="md-icon-button md-primary" aria-label="Create" ng-click="addName=1; addMembers=0;">
+        	<md-icon md-svg-icon="img/122636.svg"></md-icon>
+      	</md-button>
+	</div>
+	<div ng-show="addName">
+		<md-input-container class="md-block" flex-gt-sm>
+			<label>Space Name</label>
+			<input type="text" ng-model="groupName"><br>
+		</md-input-container>
+		<md-button class="md-fab md-primary" aria-label="New Group" ng-click="addName=0; homepage=1;">
+          <md-icon md-svg-src="img/122636.svg"></md-icon>
+        </md-button>
+	</div>
+	<div ng-show="homepage" class="pull-right">
+		<md-button class="md-fab md-primary" aria-label="New Group" ng-click="addMembers=1; homepage=0;">
+          <md-icon md-svg-src="img/123377.svg"></md-icon>
+        </md-button>
+    </div>
+	<div class="group" id="{{grp._id}}" ng-class="{active: $parent.selected==grp._id}" ng-repeat="grp in groups | orderBy:'latestPost':true " ng-click="loadGroup( grp._id ); $parent.selected=grp._id">
 		<p>{{grp.name}}</p>
 		<small ng-repeat="user in grp.users">{{user}}, </small>
 		<hr>
 	</div>
 </div>
 
-<div id="right" ng-show="currentGroupId" style="width: 75%; float: right">
-	<h3>Files</h3>
-	<nav class="navbar-fluid navbar-default navbar-fixed">
+<div id="right" ng-show="currentGroupId" style="width: 50%; float: left">
+	<nav class="upload-bar navbar navbar-default navbar-fixed">
 		<input type="file" id="myfile" name="myfile">
-		<md-button class="md-raised md-primary" type="submit" ng-click="uploadFile()">Upload</md-button>
+		<md-button class="md-raised md-primary" style="float: right;" type="submit" ng-click="uploadFile()">Upload</md-button>
 		<md-progress-linear md-mode="determinate" value="{{vm.determinateValue}}" ng-show="showBar"></md-progress-linear>
 	</nav>
-	<div ng-repeat="post in posts | orderBy:'created_at':true ">
-		<p>{{post.name}}</p>
-		<a href="{{post.path}}" download>Download</a>
-		<small>{{post.size}}</small>
-		<small>{{post.user}}</small>
-		<small>{{post.user_id}}</small>
-		<hr>
+	<div class="posts">
+		<div ng-repeat="post in posts | orderBy:'created_at':true ">
+			<p>{{post.name}}</p>
+			<a href="{{post.path}}" download>Download</a>
+			<small>{{post.size}}</small>
+			<small>{{post.user}}</small>
+			<small>{{post.user_id}}</small>
+			<hr>
+		</div>
 	</div>
+</div>
+
+<div id="public" style="width: 25%; float: right">
 </div>
