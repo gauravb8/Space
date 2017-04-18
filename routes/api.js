@@ -43,7 +43,6 @@ router.get('/posts', function(req, res, next){
 
 router.get('/groups', function(req, res, next){
   var user_id = req.query.user_id;
-  console.log(user_id);
   var group_ids = [],
       groups = [];
 
@@ -55,7 +54,6 @@ router.get('/groups', function(req, res, next){
         return res.status(500).send(err);
       console.log('found user');
       group_ids = user.group_ids;
-      console.log(group_ids);
       callback();
     });
     console.log('debug1');
@@ -64,11 +62,9 @@ router.get('/groups', function(req, res, next){
   var second = function(callback){
     //Retrieve group objects corresponding to ids.
     console.log('debug2');
-    console.log(group_ids);
     for (var i = 0; i < group_ids.length; ++i)
     {
       id = group_ids[i];
-      console.log(id);
       Group.findById(id, function(err, group){
         if (err)
           return res.status(500).send(err);
@@ -162,7 +158,11 @@ router.get('/exists', function(req, res, next){
 // });
 
 router.get('/publicPosts', function(req, res, next){
-  Post.find( {})
+  Post.find( { group: '58f6504b52f4a6dd0156e316'}, function(err, pub){
+    if (err)
+      return res.status(500).send(err);
+    return res.status(200).send(pub);
+  })
 });
 
 router.post('/upload', upload.single('myfile'), function(req, res, next){

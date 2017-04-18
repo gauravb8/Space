@@ -12,7 +12,10 @@ h3{
 
 body {
   padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  /*font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;*/
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
   overflow-x: hidden;
   display: flex;
   /*overflow: hidden;*/
@@ -82,4 +85,12 @@ a {
 
 .box {
   margin-top: 50px;
+}
+
+p{
+  font-weight: 500;
+}
+
+.newGroup{
+  padding-bottom: 20px;
 }

@@ -1,4 +1,4 @@
-var app = angular.module('myApp', ['ngMaterial','ngRoute','ngResource','angucomplete']);
+var app = angular.module('myApp', ['ngMaterial','ngRoute','ngResource','angucomplete','btford.socket-io']);
 
 app.run(function($rootScope, $http, $location) {
   $rootScope.authenticated = false;
@@ -59,7 +59,11 @@ app.config(function($routeProvider){
     });
 });
 
-app.controller('Ctrl', function($scope, $rootScope, $interval, $http, $timeout, $q, $log) {
+app.factory('mySocket', function (socketFactory) {
+  return socketFactory();
+})
+
+app.controller('Ctrl', function($scope, $rootScope, $interval, $http, $timeout, $q, $log, mySocket) {
     $scope.homepage = 1;
     $scope.addMembers = 0;
     $scope.addName = 0;
@@ -148,6 +152,7 @@ app.controller('Ctrl', function($scope, $rootScope, $interval, $http, $timeout, 
     $scope.showBar = 0;
     $scope.currentGroupId = 0;
     $scope.selected = '';
+    $scope.newMessage = '';
     console.log($rootScope.user_id);
     //Get Groups list..
     function getGroups(){
@@ -186,9 +191,17 @@ app.controller('Ctrl', function($scope, $rootScope, $interval, $http, $timeout, 
       getGroups();
     }
 
+    mySocket.on('recieveMsg', function(grpid){
+      $scope.newMessage = grpid;
+      // console.log('recieved group id : '+grpid);
+      getGroups();
+    });
+
     //To load posts specific to a group from DB...
     $scope.loadGroup = function(grpid){
-      console.log(self.asyncContacts);
+      if (grpid==$scope.newMessage)
+        $scope.newMessage = '';
+      // console.log(self.asyncContacts);
       $scope.selected = "selected";
       $scope.currentGroupId = grpid;
       console.log(grpid);
@@ -235,6 +248,7 @@ app.controller('Ctrl', function($scope, $rootScope, $interval, $http, $timeout, 
         $http.get('api/groups', { params : {user_id: $rootScope.user_id } }).success( function(res){
           $scope.groups = res;
         });
+        mySocket.emit('sendMsg', $scope.currentGroupId);
       };
       xhr.send(formData);
     }

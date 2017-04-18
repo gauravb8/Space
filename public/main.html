@@ -1,5 +1,5 @@
 <div id="left" ng-show="authenticated" style="width: 25%; float: left">
-	<div ng-show="addMembers">
+	<div align="center" ng-show="addMembers">
 		<md-content class="md-padding autocomplete" layout="column">
 		    <md-contact-chips
 		        ng-model="vm.asyncContacts"
@@ -13,8 +13,11 @@
 		        placeholder="Search by username">
 		    </md-contact-chips>
 		</md-content>
-		<md-button align="center" class="md-icon-button md-primary" aria-label="Create" ng-click="addName=1; addMembers=0;">
-        	<md-icon md-svg-icon="img/122636.svg"></md-icon>
+		<md-button class="md-fab md-primary" aria-label="Create" ng-click="addMembers=0; homepage=1;">
+        	<md-icon md-svg-src="img/arrow-left-direction.svg"></md-icon>
+      	</md-button>
+		<md-button class="md-fab md-primary" aria-label="Create" ng-click="addName=1; addMembers=0;">
+        	<md-icon md-svg-src="img/right-arrow.svg"></md-icon>
       	</md-button>
 	</div>
 	<div align="center" ng-show="addName">
@@ -22,18 +25,27 @@
 			<label>Space Name</label>
 			<input type="text" ng-model="groupName"><br>
 		</md-input-container>
+		<md-button class="md-fab md-primary" aria-label="Create" ng-click="addName=0; addMembers=1;">
+        	<md-icon md-svg-src="img/arrow-left-direction.svg"></md-icon>
+      	</md-button>
 		<md-button align="center" class="md-fab md-primary" aria-label="New Group" ng-click="createNewGroup()">
-          <md-icon md-svg-src="img/122636.svg"></md-icon>
+          <md-icon md-svg-src="img/right-arrow.svg"></md-icon>
         </md-button>
 	</div>
-	<div align="center" ng-show="homepage">
-		<md-button align="center" class="md-fab md-primary" aria-label="New Group" ng-click="addMembers=1; homepage=0;">
-          <md-icon md-svg-src="img/123377.svg"></md-icon>
+	<div align="center" class="newGroup" ng-show="homepage">
+		<md-button class="md-fab md-primary" aria-label="New Group" ng-click="addMembers=1; homepage=0;">
+          <md-icon md-svg-src="img/add.svg"></md-icon>
         </md-button>
     </div>
 	<div class="group" id="{{grp._id}}" ng-class="{active: $parent.selected==grp._id}" ng-repeat="grp in groups | orderBy:'latestPost':true " ng-click="loadGroup( grp._id ); $parent.selected=grp._id">
-		<p>{{grp.name}}</p>
-		<small ng-repeat="user in grp.users">{{user}}, </small>
+        <div ng-show="grp._id == newMessage" style="width: 12%" class="pull-right" >
+			<img width="100%" src="img/chat.png">
+		</div>
+		<p style="text-transform: uppercase;">{{grp.name}}</p>
+		<small ng-repeat="user in grp.users">
+			{{user}}
+			<small ng-show="!$last">, </small>
+		</small>
 		<hr>
 	</div>
 </div>
@@ -46,11 +58,13 @@
 	</nav>
 	<div class="posts">
 		<div ng-repeat="post in posts | orderBy:'created_at':true ">
-			<p>{{post.name}}</p>
-			<a href="{{post.path}}" download>Download</a>
-			<small>{{post.size}}</small>
-			<small>{{post.user}}</small>
-			<small>{{post.user_id}}</small>
+			<p>
+				{{post.name}}
+				<a href="{{post.path}}" class="pull-right" download>Download</a>
+			</p>
+			<small>{{post.size/1024 | number:0}}MB</small>
+			<small class="pull-right">
+			{{post.user}} at {{post.created_at | date:"h:mma 'on' MMM d, y"}}</small>
 			<hr>
 		</div>
 	</div>
@@ -60,11 +74,13 @@
 	<h3 align="center">Public Posts</h3>
 	<div class="posts">
 		<div ng-repeat="post in publicPosts | orderBy:'created_at':true ">
-			<p>{{post.name}}</p>
-			<a href="{{post.path}}" download>Download</a>
-			<small>{{post.size}}</small>
-			<small>{{post.user}}</small>
-			<small>{{post.user_id}}</small>
+			<p>
+				{{post.name}}
+				<a href="{{post.path}}" class="pull-right" download>Download</a>
+			</p>
+			<small>{{post.size/1024 | number:0}} MB</small>
+			<small class="pull-right">
+			{{post.user}} at {{post.created_at | date:"h:mma 'on' MMM d, y"}}</small>
 			<hr>
 		</div>
 	</div>

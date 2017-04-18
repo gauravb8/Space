@@ -15,6 +15,10 @@ var mongoose = require('mongoose');                         //add for Mongo supp
 mongoose.connect('mongodb://localhost/mydb');              //connect to Mongo
 var app = express();
 
+// Socket.io setup..
+var io = require('socket.io')();
+app.io = io;
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -37,6 +41,17 @@ app.use(passport.session());
 app.use('/', index);
 app.use('/auth', authenticate);
 app.use('/api', api);
+
+io.on('connection', function(socket){
+  console.log('new user connected');
+  socket.on('disconnect', function(){
+    console.log('user disconnect');
+  });
+
+  socket.on('sendMsg', function(grpid){
+    socket.broadcast.emit('recieveMsg', grpid);
+  });
+});
 
 
 // catch 404 and forward to error handler
