@@ -62,7 +62,7 @@
 				{{post.name}}
 				<a href="{{post.path}}" class="pull-right" download>Download</a>
 			</p>
-			<small>{{post.size/1024 | number:0}}MB</small>
+			<small>{{( post.size/(1024*1024) ) | number:0}} MB</small>
 			<small class="pull-right">
 			{{post.user}} at {{post.created_at | date:"h:mma 'on' MMM d, y"}}</small>
 			<hr>
@@ -78,7 +78,7 @@
 				{{post.name}}
 				<a href="{{post.path}}" class="pull-right" download>Download</a>
 			</p>
-			<small>{{post.size/1024 | number:0}} MB</small>
+			<small>{{( post.size/(1024*1024) ) | number:0}} MB</small>
 			<small class="pull-right">
 			{{post.user}} at {{post.created_at | date:"h:mma 'on' MMM d, y"}}</small>
 			<hr>

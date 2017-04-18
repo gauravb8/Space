@@ -162,7 +162,7 @@ router.get('/publicPosts', function(req, res, next){
     if (err)
       return res.status(500).send(err);
     return res.status(200).send(pub);
-  })
+  });
 });
 
 router.post('/upload', upload.single('myfile'), function(req, res, next){

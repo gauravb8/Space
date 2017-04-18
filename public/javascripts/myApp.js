@@ -157,7 +157,11 @@ app.controller('Ctrl', function($scope, $rootScope, $interval, $http, $timeout, 
     //Get Groups list..
     function getGroups(){
       $http.get('api/groups', { params : {user_id: $rootScope.user_id } }).success( function(res){
-        $scope.groups = res;
+        $scope.groups = [];
+        for (var i = 0; i < res.length; i++) {
+          if (res[i] != null)
+            $scope.groups.push(res[i]);
+        }
       });
     }
     getGroups();
