@@ -143,33 +143,6 @@ app.controller('Ctrl', function($scope, $rootScope, $interval, $http, $timeout, 
       });
     }
 
-    function loadContacts() {
-      var contacts = [
-        'Marina Augustine',
-        'Oddr Sarno',
-        'Nick Giannopoulos',
-        'Narayana Garner',
-        'Anita Gros',
-        'Megan Smith',
-        'Tsvetko Metzger',
-        'Hector Simek',
-        'Some-guy withalongalastaname'
-      ];
-
-      return contacts.map(function (c, index) {
-        var cParts = c.split(' ');
-        var email = cParts[0][0].toLowerCase() + '.' + cParts[1].toLowerCase() + '@example.com';
-
-        var contact = {
-          name: c,
-          email: email,
-        };
-        contact._lowername = contact.name.toLowerCase();
-        return contact;
-      });
-    }
-
-
     // var socket = io();
     //Do not show progress bar initially
     $scope.showBar = 0;
@@ -177,15 +150,41 @@ app.controller('Ctrl', function($scope, $rootScope, $interval, $http, $timeout, 
     $scope.selected = '';
     console.log($rootScope.user_id);
     //Get Groups list..
-    $http.get('api/groups', { params : {user_id: $rootScope.user_id } }).success( function(res){
-      $scope.groups = res;
-    });
+    function getGroups(){
+      $http.get('api/groups', { params : {user_id: $rootScope.user_id } }).success( function(res){
+        $scope.groups = res;
+      });
+    }
+    getGroups();
+
+    $http.get('api/publicPosts').success(function(res){
+      $scope.publicPosts = res;
+    })
 
     //progress bar setup
     self.activated = true;
     self.determinateValue = 0;
     $interval(function() {
     }, 100, 0, true);
+
+    $scope.createNewGroup = function(){
+      $scope.addName = 0;
+      $scope.homepage = 1;
+      var usernames = [$rootScope.current_user],
+          userids = [$rootScope.user_id];
+      for (var i = 0; i < self.asyncContacts.length; i++) {
+        usernames.push(self.asyncContacts[i].username);
+        userids.push(self.asyncContacts[i]._id);
+      }
+      $http.post('/api/createGroup', {
+        name: $scope.groupName,
+        users: usernames,
+        userids: userids
+      }).success(function(res){
+        console.log(res);
+      });
+      getGroups();
+    }
 
     //To load posts specific to a group from DB...
     $scope.loadGroup = function(grpid){

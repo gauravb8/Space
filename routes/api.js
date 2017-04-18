@@ -82,7 +82,6 @@ router.get('/groups', function(req, res, next){
   async.series( [first, second], function(err, results){
     if (err)
       return res.status(500).send(err);
-    console.log(results);
     return res.status(200).send(groups);
   });
 
@@ -106,16 +105,44 @@ router.get('/users', function(req, res, next){
 });
 
 router.post('/createGroup', function(req, res, next){
-  var newGroup = new Group( { name: req.body.name,
-                              users: req.body.users,
-                              userIds: req.body.userids,
-                              latestPost: Date.now() 
-                            });
-  newGroup.save(function(err, newGroup){
+  var newGroupId;
+
+  var first = function(callback){
+    //Create new group with passed data
+    var newGroup = new Group( { name: req.body.name,
+                                users: req.body.users,
+                                userIds: req.body.userids,
+                                latestPost: Date.now() 
+                              });
+    newGroup.save(function(err, newGroup){
+      if (err)
+        return res.status(500).send(err);
+      console.log("new group created");
+      newGroupId = newGroup._id;
+      callback();
+    });
+  }
+
+  var second = function(callback){
+    //Add new group to members' group list
+    for (var i = 0; i < req.body.userids.length; i++) {
+      User.update( { _id: req.body.userids[i] } , { $push : { group_ids: newGroupId} }, {}, function(err, doc){
+        if (err)
+          return res.status(500).send(err);
+        if (i == req.body.userids.length-1){
+          console.log("Users' group list updated");
+          callback();
+        }
+      });
+    }
+  }
+
+  async.series( [first, second], function(err, results){
     if (err)
       return res.status(500).send(err);
-    return res.status(200).send("new group created");
+    return res.status(200).send("Successfully created group");
   });
+
 });
 
 router.get('/exists', function(req, res, next){
@@ -130,9 +157,13 @@ router.get('/exists', function(req, res, next){
                   });
 });
 
-router.post('/createPost', function(req, res, next){
-  var date = Date.now();
-})
+// router.post('/createPost', function(req, res, next){
+//   var date = Date.now();
+// });
+
+router.get('/publicPosts', function(req, res, next){
+  Post.find( {})
+});
 
 router.post('/upload', upload.single('myfile'), function(req, res, next){
   if (!req.file)
