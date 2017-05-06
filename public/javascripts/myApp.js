@@ -1,4 +1,4 @@
-var app = angular.module('myApp', ['ngMaterial','ngRoute','ngResource','angucomplete','btford.socket-io']);
+var app = angular.module('myApp', ['ngMaterial','ngRoute','ngResource','angucomplete','btford.socket-io','angular-web-notification']);
 
 app.run(function($rootScope, $http, $location) {
   $rootScope.authenticated = false;
@@ -63,7 +63,7 @@ app.factory('mySocket', function (socketFactory) {
   return socketFactory();
 })
 
-app.controller('Ctrl', function($scope, $rootScope, $interval, $http, $timeout, $q, $log, mySocket) {
+app.controller('Ctrl', function($scope, $rootScope, $interval, $http, $timeout, $q, $log, mySocket, webNotification) {
     $scope.homepage = 1;
     $scope.addMembers = 0;
     $scope.addName = 0;
@@ -152,7 +152,7 @@ app.controller('Ctrl', function($scope, $rootScope, $interval, $http, $timeout, 
     $scope.showBar = 0;
     $scope.currentGroupId = 0;
     $scope.selected = '';
-    $scope.newMessage = '';
+    $scope.newMessages = [];
     console.log($rootScope.user_id);
     //Get Groups list..
     function getGroups(){
@@ -195,16 +195,60 @@ app.controller('Ctrl', function($scope, $rootScope, $interval, $http, $timeout, 
       getGroups();
     }
 
-    mySocket.on('recieveMsg', function(grpid){
-      $scope.newMessage = grpid;
+    $scope.delGroup = function(grp){
+      if (grp._id == $scope.currentGroupId)
+        $scope.currentGroupId = 0;
+      var del = grp.userIds.length == 1;
+      $http.delete('api/deleteGroup', {params : {grpid: grp._id,
+                                                 username: $rootScope.current_user,
+                                                 del: del,
+                                                 userid: $rootScope.user_id} }).success(function(res){
+        console.log(res);
+        getGroups();
+      });
+    }
+
+    $scope.displayNotif = function(grpid){
+      for (var i = 0; i < $scope.newMessages.length; i++) {
+        if ($scope.newMessages[i]==grpid)
+          return true;
+      }
+      return false;
+    }
+
+    mySocket.on('recieveMsg', function(data){
+      $scope.newMessages.push(data.grpid);
       // console.log('recieved group id : '+grpid);
       getGroups();
+      webNotification.showNotification('New file recieved!',{
+        body: data.filename,
+        icon: '../img/chat.png',
+        onClick: function onNotificationClicked() {
+            window.focus();
+            console.log('Notification clicked.');
+        },
+        autoClose: 5000
+      }, function onShow(error, hide) {
+          if (error) {
+              window.alert('Unable to show notification: ' + error.message);
+          } else {
+              console.log('Notification Shown.');
+
+              setTimeout(function hideNotification() {
+                  console.log('Hiding notification....');
+                  hide(); //manually close the notification (you can skip this if you use the autoClose option) 
+              }, 5000);
+
+            }
+        });
     });
 
     //To load posts specific to a group from DB...
     $scope.loadGroup = function(grpid){
-      if (grpid==$scope.newMessage)
-        $scope.newMessage = '';
+      for (var i = 0; i < $scope.newMessages.length; i++) {
+        if ($scope.newMessages[i] == grpid)
+          $scope.newMessages.splice($scope.newMessages.indexOf(grpid), 1);
+      }
       // console.log(self.asyncContacts);
       $scope.selected = "selected";
       $scope.currentGroupId = grpid;
@@ -247,12 +291,15 @@ app.controller('Ctrl', function($scope, $rootScope, $interval, $http, $timeout, 
         console.log(this.statusText);
         $http.get('api/groupPosts', { params : {id : $scope.currentGroupId } }).success( function(res){
           $scope.posts = res;
-          console.log($scope.posts.length);
+          // console.log($scope.posts.length);
         });
-        $http.get('api/groups', { params : {user_id: $rootScope.user_id } }).success( function(res){
-          $scope.groups = res;
+        getGroups();
+        // console.log($scope.groups);
+        // console.log(file);
+        mySocket.emit('sendMsg', {
+          grpid: $scope.currentGroupId,
+          filename: file.name
         });
-        mySocket.emit('sendMsg', $scope.currentGroupId);
       };
       xhr.send(formData);
     }

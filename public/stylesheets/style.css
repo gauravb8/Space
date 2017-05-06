@@ -94,3 +94,15 @@ p{
 .newGroup{
   padding-bottom: 20px;
 }
+
+.delete{
+  display: none;
+}
+
+.delete:hover{
+  background-color: #7895F7;
+}
+
+.group:hover .delete{
+  display: block;
+}

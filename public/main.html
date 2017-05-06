@@ -38,7 +38,10 @@
         </md-button>
     </div>
 	<div class="group" id="{{grp._id}}" ng-class="{active: $parent.selected==grp._id}" ng-repeat="grp in groups | orderBy:'latestPost':true " ng-click="loadGroup( grp._id ); $parent.selected=grp._id">
-        <div ng-show="grp._id == newMessage" style="width: 12%" class="pull-right" >
+		<div style="width: 7%; margin: 5px;" class="pull-right delete" ng-click="delGroup( grp ); $event.stopPropagation();">
+			<img width="100%" src="img/delete.png">
+		</div>
+        <div ng-show="displayNotif( grp._id )" style="width: 12%" class="pull-right" >
 			<img width="100%" src="img/chat.png">
 		</div>
 		<p style="text-transform: uppercase;">{{grp.name}}</p>

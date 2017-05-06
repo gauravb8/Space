@@ -6,6 +6,8 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "angular-socket-io": "0.7.0",
+    "angular-web-notification": "^1.2.15",
     "async": "^2.3.0",
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "~1.15.1",

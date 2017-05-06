@@ -48,8 +48,8 @@ io.on('connection', function(socket){
     console.log('user disconnect');
   });
 
-  socket.on('sendMsg', function(grpid){
-    socket.broadcast.emit('recieveMsg', grpid);
+  socket.on('sendMsg', function(data){
+    socket.broadcast.emit('recieveMsg', data);
   });
 });
 

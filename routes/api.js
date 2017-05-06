@@ -165,6 +165,38 @@ router.get('/publicPosts', function(req, res, next){
   });
 });
 
+router.delete('/deleteGroup', function(req, res, next){
+  var grpid = req.query.grpid, 
+      user_id = req.query.userid;
+  console.log("user_id: "+user_id+"\tgrpid: "+grpid);
+
+  //Remove group from user's group list..
+  User.update( {_id: user_id }, { $pull : {group_ids: grpid} }, {}, function(err, doc){
+    if (err)
+      return res.status(500).send(err);
+    console.log(doc);
+  });
+  console.log("del : "+req.query.del);
+  if (req.query.del===true){
+    //If group has no members left, delete group..
+    console.log('deleting...');
+    Group.findByIdAndRemove(grpid, function(err, doc){
+      if (err)
+        return res.status(500).send(err);
+      return res.status(200).send('Group deleted');
+    });
+  }
+  else{
+    //Else remove current user from group's user list.
+    Group.update( {_id: grpid}, { $pull: { users: req.query.username,
+                                           userIds: user_id} }, {}, function(err, doc){
+      if (err)
+        res.status(500).send(err);
+      res.status(200).send('User removed from group');
+    });
+  }
+});
+
 router.post('/upload', upload.single('myfile'), function(req, res, next){
   if (!req.file)
     return res.status(400).send('No files');
