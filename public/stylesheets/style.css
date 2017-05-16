@@ -39,6 +39,7 @@ a {
 }
 
 #right, #left{
+  transition: all ease-out 0.3s;
   padding-right: 25px;
 	overflow: auto;
   height: 100%;
@@ -62,7 +63,11 @@ a {
     display: none;
 }
 
-.group:hover{
+.group{
+  transition: all ease-out 1s;
+}
+
+.group:hover{  
 	background-color: #EFEFEF;
 }
 
@@ -97,12 +102,26 @@ p{
 
 .delete{
   display: none;
-}
-
-.delete:hover{
-  background-color: #7895F7;
+  transition: all ease-out 0.3s;
 }
 
 .group:hover .delete{
   display: block;
 }
+
+.uploader{
+  transition: all ease-out 0.3s;
+  width: 100%;
+  height: 70px;
+  background-color: #43B753;
+  border-radius: 7px;
+}
+
+.uploader:hover{
+  background-color: #4FD461;
+}
+
+#myfile{
+  display: none;
+}
+

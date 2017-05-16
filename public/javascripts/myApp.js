@@ -61,7 +61,17 @@ app.config(function($routeProvider){
 
 app.factory('mySocket', function (socketFactory) {
   return socketFactory();
-})
+});
+
+app.directive('customOnChange', function() {
+  return {
+    restrict: 'A',
+    link: function (scope, element, attrs) {
+      var onChangeHandler = scope.$eval(attrs.customOnChange);
+      element.bind('change', onChangeHandler);
+    }
+  };
+});
 
 app.controller('Ctrl', function($scope, $rootScope, $interval, $http, $timeout, $q, $log, mySocket, webNotification) {
     $scope.homepage = 1;
@@ -150,6 +160,7 @@ app.controller('Ctrl', function($scope, $rootScope, $interval, $http, $timeout, 
     // var socket = io();
     //Do not show progress bar initially
     $scope.showBar = 0;
+    $scope.exit = false;
     $scope.currentGroupId = 0;
     $scope.selected = '';
     $scope.newMessages = [];
@@ -198,6 +209,7 @@ app.controller('Ctrl', function($scope, $rootScope, $interval, $http, $timeout, 
     $scope.delGroup = function(grp){
       if (grp._id == $scope.currentGroupId)
         $scope.currentGroupId = 0;
+      $scope.exitId = grp._id;
       var del = grp.userIds.length == 1;
       $http.delete('api/deleteGroup', {params : {grpid: grp._id,
                                                  username: $rootScope.current_user,
