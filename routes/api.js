@@ -198,30 +198,33 @@ router.delete('/deleteGroup', function(req, res, next){
   }
 });
 
-router.post('/upload', upload.single('myfile'), function(req, res, next){
-  if (!req.file)
+router.post('/upload', upload.array('myfile'), function(req, res, next){
+  if (!req.files)
     return res.status(400).send('No files');
   console.log('creating post');
+  console.log(req.files.length);
   var date = Date.now();
   // Create new post.
-  var newPost = new Post({ name : req.file.originalname,
-                           size : req.file.size,
-                           path : 'store/' + req.file.originalname,
-                           user : req.body.user,
-                           user_id : req.body.user_id,
-                           group : req.body.groupid,
-                           created_at : date
-  });
-  console.log('new post created');
-  // Save new post to database.
-  newPost.save(function(err, newPost){
-    if (err){
-      console.log('Error occured');
-      return console.error(err);
-    }
-    console.log('Post saved to DB');
-  });
-  console.log('file uploaded : '+req.file.originalname);
+  for (var i = 0; i < req.files.length; i++) {
+    var newPost = new Post({ name : req.files[i].originalname,
+                             size : req.files[i].size,
+                             path : 'store/' + req.files[i].originalname,
+                             user : req.body.user,
+                             user_id : req.body.user_id,
+                             group : req.body.groupid,
+                             created_at : date
+    });
+    // console.log('new post created');
+    // Save new post to database.
+    newPost.save(function(err, newPost){
+      if (err){
+        console.log('Error occured');
+        return console.error(err);
+      }
+      // console.log('Post saved to DB');
+    });
+    // console.log('file uploaded : '+req.files[i].originalname);
+  }
   // Update latestPost value for group.
   Group.update( { _id: req.body.groupid } , { latestPost : date }, {}, function(err, doc){
     if (err)

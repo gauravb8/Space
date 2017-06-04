@@ -288,8 +288,11 @@ app.controller('Ctrl', function($scope, $rootScope, $interval, $http, $timeout, 
   
       $scope.showBar = 1; // Show progress bar
       var formData = new FormData();
-      var file = document.getElementById('myfile').files[0];
-      formData.append('myfile', file);
+      var files = document.getElementById('myfile').files;
+      // console.log(files);
+      for (var i = 0; i < files.length; i++) {
+        formData.append('myfile', files[i]);
+      }
       formData.append('user', $rootScope.current_user);
       formData.append('groupid', $scope.currentGroupId);
       formData.append('user_id', $rootScope.user_id);
@@ -323,7 +326,7 @@ app.controller('Ctrl', function($scope, $rootScope, $interval, $http, $timeout, 
         // console.log(file);
         mySocket.emit('sendMsg', {
           grpid: $scope.currentGroupId,
-          filename: file.name
+          filename: files[0].name
         });
       };
       xhr.send(formData);

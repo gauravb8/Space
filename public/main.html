@@ -60,7 +60,7 @@
 			<label align="center" for="myfile" class="uploader">
 				<img style="width: 12%; margin-top: 1px;" src="img/add_cross_new_plus_create-512.png">
 			</label>
-			<input type="file" id="myfile" name="myfile" custom-on-change="uploadFile">
+			<input type="file" multiple id="myfile" name="myfile" custom-on-change="uploadFile">
 			<md-progress-linear md-mode="determinate" value="{{vm.determinateValue}}" ng-show="showBar"></md-progress-linear>
 		</div>
 	<div class="posts">
@@ -96,7 +96,7 @@
 				onmouseover="this.src='img/add_hover.png'"
 				onmouseout="this.src='img/add.png'">
 		</label>
-		<input type="file" style="display: none;" id="pub" name="pub" custom-on-change="pubUpload">
+		<input type="file" multiple style="display: none;" id="pub" name="pub" custom-on-change="pubUpload">
 		<md-progress-linear md-mode="determinate" value="{{vm.determinateValue}}" ng-show="showPubBar"></md-progress-linear>
 	</div>
 	<div class="posts">
