@@ -64,10 +64,21 @@
 			<md-progress-linear md-mode="determinate" value="{{vm.determinateValue}}" ng-show="showBar"></md-progress-linear>
 		</div>
 	<div class="posts">
-		<div ng-repeat="post in posts | orderBy:'created_at':true ">
+		<div class="post" ng-repeat="post in posts | orderBy:'created_at':true ">
+			<div style="width: 4%; margin: 2px;" class="pull-right download">
+			<a href="{{post.path}}" class="pull-right" download>
+					<img width="100%" src="img/download.png" 
+						onmouseover="this.src='img/download_hover.png'"
+						onmouseout="this.src='img/download.png'">
+			</a>
+			</div>
+			<div style="width: 3%; margin: 5px;" class="pull-right delete" ng-click="delPost( post ); $event.stopPropagation();">
+				<img width="100%" src="img/delete.png" 
+					onmouseover="this.src='img/delete_hover.png'"
+					onmouseout="this.src='img/delete.png'">
+			</div>
 			<p>
 				{{post.name}}
-				<a href="{{post.path}}" class="pull-right" download>Download</a>
 			</p>
 			<small>{{( post.size/(1024*1024) ) | number:0}} MB</small>
 			<small class="pull-right">
@@ -79,6 +90,15 @@
 
 <div id="public" style="width: 25%; float: right">
 	<h3 align="center">Public Posts</h3>
+	<div class="upload-bar">
+		<label align="center" for="pub" class="pub">
+			<img style="width: 12%; margin-top: 1px;" src="img/add.png"
+				onmouseover="this.src='img/add_hover.png'"
+				onmouseout="this.src='img/add.png'">
+		</label>
+		<input type="file" style="display: none;" id="pub" name="pub" custom-on-change="pubUpload">
+		<md-progress-linear md-mode="determinate" value="{{vm.determinateValue}}" ng-show="showPubBar"></md-progress-linear>
+	</div>
 	<div class="posts">
 		<div ng-repeat="post in publicPosts | orderBy:'created_at':true ">
 			<p>

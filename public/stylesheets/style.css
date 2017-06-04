@@ -58,13 +58,25 @@ a {
   margin-top: 20px;
 }
 
+.post:hover{
+  background-color: #EFEFEF;
+}
+
+.post:hover .delete{
+  display: block;
+}
+
+.post:hover .download{
+  display: block;
+}
+
 #left::-webkit-scrollbar,
 #right::-webkit-scrollbar {
     display: none;
 }
 
 .group{
-  transition: all ease-out 1s;
+  transition: all ease-out 0.6s;
 }
 
 .group:hover{  
@@ -100,6 +112,11 @@ p{
   padding-bottom: 20px;
 }
 
+.download{
+  display: none;
+  transition: all ease-out 0.3s;
+}
+
 .delete{
   display: none;
   transition: all ease-out 0.3s;
@@ -123,5 +140,9 @@ p{
 
 #myfile{
   display: none;
+}
+
+.pub{
+  transition: all ease-out 0.3s;
 }
 

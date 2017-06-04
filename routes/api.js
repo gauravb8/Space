@@ -1,5 +1,6 @@
 var express = require('express');
 var path = require('path');
+var fs = require('fs');
 var router = express.Router();
 var mongoose = require( 'mongoose' );
 var Post = mongoose.model('Post');
@@ -228,6 +229,19 @@ router.post('/upload', upload.single('myfile'), function(req, res, next){
     console.log('Group latestPost updated');
   });
   return res.status(200).send('uploaded and updated');
+});
+
+router.delete('/deletePost', function(req, res, next){
+  Post.findByIdAndRemove(req.query.id, function(err, doc){
+    if(err)
+      return res.status(500).send(err);
+    console.log('removed from db');
+  });
+  fs.unlink(path.join(__dirname, '../public', req.query.path), function(err){
+    if (err)
+      return res.status(500).send(err);
+    return res.status(200).send('post deleted');
+  });
 });
 
 module.exports = router;

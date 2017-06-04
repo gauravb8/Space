@@ -220,6 +220,16 @@ app.controller('Ctrl', function($scope, $rootScope, $interval, $http, $timeout, 
       });
     }
 
+    $scope.delPost = function(post){
+      $http.delete('api/deletePost', { params: {id: post._id,
+                                                path: post.path} }).success(function(res){
+        console.log('post deleted');
+        $http.get('api/groupPosts', {params: { id: $scope.currentGroupId} }).success(function(res){
+          $scope.posts = res;
+        });
+      });
+    }
+
     $scope.displayNotif = function(grpid){
       for (var i = 0; i < $scope.newMessages.length; i++) {
         if ($scope.newMessages[i]==grpid)
@@ -257,6 +267,8 @@ app.controller('Ctrl', function($scope, $rootScope, $interval, $http, $timeout, 
 
     //To load posts specific to a group from DB...
     $scope.loadGroup = function(grpid){
+      $scope.posts = [];
+      console.log($scope.posts);
       for (var i = 0; i < $scope.newMessages.length; i++) {
         if ($scope.newMessages[i] == grpid)
           $scope.newMessages.splice($scope.newMessages.indexOf(grpid), 1);
@@ -283,7 +295,8 @@ app.controller('Ctrl', function($scope, $rootScope, $interval, $http, $timeout, 
       formData.append('user_id', $rootScope.user_id);
       var xhr = new XMLHttpRequest();
 
-      // your url upload
+      // your url upload);
+
       xhr.open('post', 'api/upload', true);
 
       xhr.upload.onprogress = function(e) {
@@ -315,7 +328,47 @@ app.controller('Ctrl', function($scope, $rootScope, $interval, $http, $timeout, 
       };
       xhr.send(formData);
     }
+
+    $scope.showPubBar = 0;
+
+    $scope.pubUpload = function(){
+  
+      $scope.showPubBar = 1; // Show progress bar
+      var formData = new FormData();
+      var file = document.getElementById('pub').files[0];
+      formData.append('myfile', file);
+      formData.append('user', $rootScope.current_user);
+      formData.append('groupid', '58f6504b52f4a6dd0156e316');
+      formData.append('user_id', $rootScope.user_id);
+      var xhr = new XMLHttpRequest();
+
+      // your url upload
+      xhr.open('post', 'api/upload', true);
+
+      xhr.upload.onprogress = function(e) {
+        if (e.lengthComputable) {
+          self.determinateValue = (e.loaded / e.total) * 100;
+          // console.log(self.determinateValue + "%");
+        }
+      };
+
+      xhr.onerror = function(e) {
+        console.log('Error');
+        console.log(e);
+      };
+      xhr.onload = function() {
+        $scope.showPubBar = 0;
+        self.determinateValue = 0;
+        // console.log(this.statusText);
+        $http.get('api/publicPosts').success( function(res){
+          $scope.publicPosts = res;
+          // console.log($scope.posts.length);
+        });
+      };
+      xhr.send(formData);
+    }
   });
+
 
 app.controller('authController', function($scope, $http, $rootScope, $location){
   $scope.user = {username: '', password: ''};

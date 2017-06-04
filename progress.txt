@@ -2,6 +2,9 @@ TODO:
 
 0. Remove redundancies in database - users and posts.
 1. Add user creation and authentication. DONE
-2. Integrate socket.io to emit to all users of the group when a new post is created by one user.
-3. Add public broadcasting of posts.
-4. Share with yourself. multiple devices logged into the same account.
+2. Integrate socket.io to emit to all users of the group when a new post is created by one user. DONE
+3. Add public broadcasting of posts. DONE
+4. Share with yourself. multiple devices logged into the same account. DONE
+5. Resumable uploads.
+6. Multiple uploads.
+7. End-to-end encryption(prob asymmetric)
